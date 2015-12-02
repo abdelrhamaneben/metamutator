@@ -11,7 +11,7 @@ import spoon.reflect.code.CtVariableRead;
 /**
  * inserts a mutation hotspot for each binary operator
  */
-public class numericExpressionMetaMutator 
+public class NumericExpressionMetaMutator 
 				extends AbstractProcessor<CtVariableRead> {
 
 	public static final String PREFIX = "_numericExpressionMetaMutator";
@@ -60,14 +60,14 @@ public class numericExpressionMetaMutator
 		String expression = "(";
 		for(UNARY unary : absSet){
 			if(unary.equals(UNARY.INIT)) continue;
-			expression += PREFIX+thisIndex + ".is(\"" + unary.toString() + "\")?( " + UnaryEquivalent(unary)  + candidate.getVariable().getSimpleName() + ")):";
+			expression += PREFIX+thisIndex + ".is(" + unary.getClass().getCanonicalName()+'.'+unary.toString()+ ")?( " + UnaryEquivalent(unary)  + candidate.getVariable().getSimpleName() + ")):";
 		}
 		expression += "(" + candidate.getVariable().getSimpleName() + "))";
 		CtCodeSnippetExpression<Boolean> codeSnippet = getFactory().Core()
 				.createCodeSnippetExpression();
 		codeSnippet.setValue(expression);
 		candidate.replace(codeSnippet);
-		Selector.generateSelector(candidate, UNARY.INIT.toString(), thisIndex, absSet, PREFIX);
+		Selector.generateSelector(candidate, UNARY.INIT, thisIndex, absSet, PREFIX);
 	}
 	
 	private String UnaryEquivalent(UNARY value) {
