@@ -1,3 +1,5 @@
+package resources;
+
 public class Foo {
 	
 	public boolean op(Boolean a, Boolean b) {
@@ -6,6 +8,10 @@ public class Foo {
 	
 	public boolean op2(Integer a, Integer b) {
 		return a > b;
+	}
+	
+	public int add(Integer a, Integer b) {
+		return a + b;
 	}
 
 	public boolean op3(Class c) {
