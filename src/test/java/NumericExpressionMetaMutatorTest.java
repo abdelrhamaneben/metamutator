@@ -40,9 +40,15 @@ public class NumericExpressionMetaMutatorTest {
         
         // test with the second mutation hotspot
         Selector sel1=Selector.getSelectorByName( numericExpressionMetaMutator.PREFIX + "4");
-        sel1.choose(0);// NABS
+        sel1.choose(0);// INIT B
         assertEquals(-1, invokeExactMethod(o, "add", new Object[] {3, -4}));   
-        sel1.choose(1);// ABS
-        assertEquals(7, invokeExactMethod(o, "add", new Object[] {3, -4}));   
+        sel1.choose(1);// ABS B
+        assertEquals(7, invokeExactMethod(o, "add", new Object[] {3, -4}));  
+        sel1.choose(3);// MINUS B
+        assertEquals(7, invokeExactMethod(o, "add", new Object[] {3, -4})); 
+        sel1.choose(4);// INC B
+        assertEquals(0, invokeExactMethod(o, "add", new Object[] {3, -4}));  
+        sel1.choose(5);// DEC B
+        assertEquals(-2, invokeExactMethod(o, "add", new Object[] {3, -4}));  
     }
 }

@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 
 import spoon.processing.AbstractProcessor;
-import spoon.reflect.code.CtStatement;
-import spoon.support.reflect.code.CtAssignmentImpl;
-import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtCodeSnippetExpression;
 import spoon.reflect.code.CtVariableRead;
 
@@ -18,11 +15,22 @@ public class numericExpressionMetaMutator
 				extends AbstractProcessor<CtVariableRead> {
 
 	public static final String PREFIX = "_numericExpressionMetaMutator";
-	public enum ABS {
-		   ABS, NABS
-		   };
-	private static final EnumSet absSet = EnumSet
-			.of(ABS.ABS, ABS.NABS);
+	public enum UNARY {
+		// NO CHANGE
+		INIT,
+		// Absolute Value	
+		ABS,
+		// Unary plus
+		PLUS,
+		// Unary minus
+		MINUS,
+		// Increment
+		INC,
+		// Decrement
+		DEC
+	};
+	private static final EnumSet<UNARY> absSet = EnumSet
+			.of(UNARY.ABS, UNARY.PLUS, UNARY.MINUS, UNARY.INC, UNARY.DEC);
 	
 	public static int thisIndex = 0;
 	/**
@@ -49,15 +57,27 @@ public class numericExpressionMetaMutator
 	public void process(CtVariableRead candidate) {
 		thisIndex++;
 		
-		String expression = "";
-		expression = "(" +PREFIX+thisIndex + ".is(\"" + ABS.ABS.toString() + "\") ?"
-						+ "( Math.abs(" + candidate.getVariable().getSimpleName() + ")):"
-						+ "(" + candidate.getVariable().getSimpleName() + "))";
+		String expression = "(";
+		for(UNARY unary : absSet){
+			if(unary.equals(UNARY.INIT)) continue;
+			expression += PREFIX+thisIndex + ".is(\"" + unary.toString() + "\")?( " + UnaryEquivalent(unary)  + candidate.getVariable().getSimpleName() + ")):";
+		}
+		expression += "(" + candidate.getVariable().getSimpleName() + "))";
 		CtCodeSnippetExpression<Boolean> codeSnippet = getFactory().Core()
 				.createCodeSnippetExpression();
 		codeSnippet.setValue(expression);
 		candidate.replace(codeSnippet);
-		Selector.generateSelector(candidate, ABS.NABS.toString(), thisIndex, absSet, PREFIX);
+		Selector.generateSelector(candidate, UNARY.INIT.toString(), thisIndex, absSet, PREFIX);
 	}
 	
+	private String UnaryEquivalent(UNARY value) {
+		switch(value) {
+		case ABS : return "Math.abs(";
+		case PLUS : return "+(";
+		case MINUS : return "-(";
+		case INC : return "(++";
+		case DEC : return "(--";
+		default : return "(";
+		}
+	}
 }
