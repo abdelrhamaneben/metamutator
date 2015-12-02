@@ -1,8 +1,6 @@
-import static org.junit.Assert.*;
-
-import java.util.Arrays;
-import java.util.List;
-
+import static org.apache.commons.lang.reflect.MethodUtils.invokeExactMethod;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import metamutator.BinaryOperatorMetaMutator;
 import metamutator.Selector;
 
@@ -10,11 +8,10 @@ import org.junit.Test;
 
 import spoon.Launcher;
 import spoon.reflect.declaration.CtClass;
-import spoon.reflect.visitor.filter.TypeFilter;
+import spoon.reflect.visitor.filter.NameFilter;
 import bsh.Interpreter;
-import static org.apache.commons.lang.reflect.MethodUtils.*;
 
-public class TestMetamutator {
+public class BinaryOperatorMetaMutatorTest {
 
     @Test
     public void testBinaryOperatorMetaMutator() throws Exception {
@@ -24,9 +21,11 @@ public class TestMetamutator {
         l.addProcessor(new BinaryOperatorMetaMutator());
         l.run();
 
-        // now we get the 
-        List<CtClass> classes = l.getFactory().Package().getRootPackage().getElements(new TypeFilter(CtClass.class));
-        CtClass c = classes.get(0);
+        // now we get the code of Foo
+        CtClass c = (CtClass) l.getFactory().Package().getRootPackage().getElements(new NameFilter("Foo")).get(0);
+        
+        // printing the metaprogram
+        System.out.println("// Metaprogram: ");
         System.out.println(c.toString());
 
         // we prepare an interpreter for the transformed code
@@ -40,7 +39,7 @@ public class TestMetamutator {
         assertEquals(3,Selector.getAllSelectors().size());
         
         // test with the first
-        Selector sel=Selector.getSelectorByName("_s1");
+        Selector sel=Selector.getSelectorByName(BinaryOperatorMetaMutator.PREFIX + "1");
         
         // the initial version is OR
         assertEquals(true, invokeExactMethod(o, "op", new Object[] {Boolean.TRUE, Boolean.FALSE}));
@@ -62,7 +61,7 @@ public class TestMetamutator {
         catch (IllegalArgumentException expected){}
 
         // test with the second mutation hotspot
-        Selector sel1=Selector.getSelectorByName("_s2");
+        Selector sel1=Selector.getSelectorByName( BinaryOperatorMetaMutator.PREFIX + "2");
         sel1.choose(0);// GT
         assertEquals(false, invokeExactMethod(o, "op2", new Object[] {3, 3}));
         assertEquals(true, invokeExactMethod(o, "op2", new Object[] {5, 4}));
