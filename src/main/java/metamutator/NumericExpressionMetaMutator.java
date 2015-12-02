@@ -9,9 +9,9 @@ import spoon.reflect.code.CtCodeSnippetExpression;
 import spoon.reflect.code.CtVariableRead;
 
 /**
- * inserts a mutation hotspot for each binary operator
+ * inserts a mutation hotspot for each Numeric Variable
  */
-public class numericExpressionMetaMutator 
+public class NumericExpressionMetaMutator 
 				extends AbstractProcessor<CtVariableRead> {
 
 	public static final String PREFIX = "_numericExpressionMetaMutator";
@@ -34,7 +34,7 @@ public class numericExpressionMetaMutator
 	
 	public static int thisIndex = 0;
 	/**
-	 * Ne recupere que les valeurs numériques
+	 * Accept Numeric Variable
 	 */
 	@Override
 	public boolean isToBeProcessed(CtVariableRead candidate) {
@@ -51,7 +51,7 @@ public class numericExpressionMetaMutator
 	}
 	
 	/**
-	 * Ajoute la valeur absolue
+	 * Add Absolute, Plus, Minus, Increment or Decrement Unary Operator on Numeric Variable 
 	 */
 	@Override
 	public void process(CtVariableRead candidate) {

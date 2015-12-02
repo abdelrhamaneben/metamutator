@@ -125,7 +125,7 @@ public class BinaryOperatorMetaMutator extends
 			return;
 		}
 
-		int thisIndex = ++index;
+		
 
 		String originalKind = expression.getKind().toString();
 		String newExpression = operators
@@ -133,7 +133,7 @@ public class BinaryOperatorMetaMutator extends
 				.map(kind -> {
 					expression.setKind(kind);
 					return String.format("("+ PREFIX + "%s.is(\"%s\") && (%s))",
-							thisIndex, kind, expression);
+							index, kind, expression);
 				}).collect(Collectors.joining(" || "));
 
 		CtCodeSnippetExpression<Boolean> codeSnippet = getFactory().Core()
@@ -142,8 +142,8 @@ public class BinaryOperatorMetaMutator extends
 
 		expression.replace(codeSnippet);
 		expression.replace(expression);
-		Selector.generateSelector(expression, originalKind, thisIndex, operators, PREFIX);
-
+		Selector.generateSelector(expression, originalKind, index, operators, PREFIX);
+		index++;
 		hostSpots.add(expression);
 
 	}

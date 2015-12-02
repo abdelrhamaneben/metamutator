@@ -4,8 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import metamutator.BinaryOperatorMetaMutator;
-import metamutator.Selector;
+import metamutator.DoExpressionMetaMutator;
 import metamutator.NumericExpressionMetaMutator;
+import metamutator.Selector;
 
 import org.junit.Test;
 
@@ -16,14 +17,14 @@ import spoon.reflect.visitor.filter.TypeFilter;
 import bsh.Interpreter;
 import static org.apache.commons.lang.reflect.MethodUtils.*;
 
-public class NumericExpressionMetaMutatorTest {
+public class DoExpressionMetaMutatorTest {
 
     @Test
-    public void testBinaryOperatorMetaMutator() throws Exception {
+    public void testDoExpressionMetaMutator() throws Exception {
         // build the model and apply the transformation
         Launcher l = new Launcher();
         l.addInputResource("src/test/java/Foo.java");
-        l.addProcessor(new NumericExpressionMetaMutator());
+        l.addProcessor(new DoExpressionMetaMutator());
         l.run();
 
         // now we get the code of Foo
@@ -32,23 +33,16 @@ public class NumericExpressionMetaMutatorTest {
         // printing the metaprogram
         System.out.println("// Metaprogram: ");
         System.out.println(c.toString());
-
+        
         // we prepare an interpreter for the transformed code
         Interpreter bsh = new Interpreter();
         // creating a new instance of the class
         Object o = ((Class)bsh.eval(c.toString())).newInstance();
         
-        // test with the second mutation hotspot
-        Selector sel1=Selector.getSelectorByName( NumericExpressionMetaMutator.PREFIX + "4");
-        sel1.choose(0);// INIT B
-        assertEquals(-1, invokeExactMethod(o, "add", new Object[] {3, -4}));   
-        sel1.choose(1);// ABS B
-        assertEquals(7, invokeExactMethod(o, "add", new Object[] {3, -4}));  
-        sel1.choose(3);// MINUS B
-        assertEquals(7, invokeExactMethod(o, "add", new Object[] {3, -4})); 
-        sel1.choose(4);// INC B
-        assertEquals(0, invokeExactMethod(o, "add", new Object[] {3, -4}));  
-        sel1.choose(5);// DEC B
-        assertEquals(-2, invokeExactMethod(o, "add", new Object[] {3, -4}));  
+        Selector sel1=Selector.getSelectorByName( DoExpressionMetaMutator.PREFIX + "1");
+        sel1.choose(0);// ROUNDS 3
+        assertEquals(3, invokeExactMethod(o, "sum", new Object[] {15}));  
+        sel1.choose(1);// ROUNDS 100
+        assertEquals(100, invokeExactMethod(o, "sum", new Object[] {150}));   
     }
 }
