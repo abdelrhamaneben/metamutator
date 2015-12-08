@@ -44,6 +44,7 @@ public class NumericExpressionMetaMutator
 		if(candidate.getVariable() == null) return false;
 		System.out.println("Not null variable");
 		if(candidate.getVariable().getModifiers().contains(ModifierKind.FINAL)) return false;
+		
 		System.out.println("Not FINAL");
 		candidate.getVariable().getType();
 		if(this.isNumber(candidate.getVariable())){
@@ -77,7 +78,7 @@ public class NumericExpressionMetaMutator
 		String expression = "(";
 		for(UNARY unary : absSet){
 			if(unary.equals(UNARY.INIT)) continue;
-			expression += PREFIX+thisIndex + ".is(\"" + unary.toString() + "\")?( " + UnaryEquivalent(unary)  + candidate.getVariable().getSimpleName() + ")):";
+			expression += PREFIX+thisIndex + ".is(\"" + unary.toString() + "\")?( " + UnaryEquivalent(unary)  + candidate.toString() + ")):";
 		}
 		expression += "(" + candidate.getVariable().getSimpleName() + "))";
 		CtCodeSnippetExpression<Boolean> codeSnippet = getFactory().Core()
