@@ -7,6 +7,7 @@ import java.util.EnumSet;
 import spoon.processing.AbstractProcessor;
 import spoon.reflect.code.CtCodeSnippetExpression;
 import spoon.reflect.code.CtVariableRead;
+import spoon.reflect.declaration.ModifierKind;
 
 /**
  * inserts a mutation hotspot for each Numeric Variable
@@ -20,8 +21,6 @@ public class NumericExpressionMetaMutator
 		INIT,
 		// Absolute Value	
 		ABS,
-		// Unary plus
-		PLUS,
 		// Unary minus
 		MINUS,
 		// Increment
@@ -30,7 +29,7 @@ public class NumericExpressionMetaMutator
 		DEC
 	};
 	private static final EnumSet<UNARY> absSet = EnumSet
-			.of(UNARY.ABS, UNARY.PLUS, UNARY.MINUS, UNARY.INC, UNARY.DEC);
+			.of(UNARY.ABS, UNARY.MINUS, UNARY.INC, UNARY.DEC);
 	
 	public static int thisIndex = 0;
 	/**
@@ -38,12 +37,19 @@ public class NumericExpressionMetaMutator
 	 */
 	@Override
 	public boolean isToBeProcessed(CtVariableRead candidate) {
+	
+		// SKIP not declared variable and Finale variable
+		if(candidate.getVariable() == null) return false;
+		candidate.getVariable();
+		if(candidate.getVariable().getModifiers().contains(ModifierKind.FINAL)) return false;
+		
 		ArrayList<String> valideType = new ArrayList<String>();
 		valideType.add("java.lang.Integer");
 		valideType.add("java.lang.Double");
 		valideType.add("java.lang.Float");
 		valideType.add("java.lang.Long");
 		
+		candidate.getVariable().getType();
 		if(valideType.contains(candidate.getVariable().getType().toString())){
 			return true;
 		}
@@ -51,7 +57,7 @@ public class NumericExpressionMetaMutator
 	}
 	
 	/**
-	 * Add Absolute, Plus, Minus, Increment or Decrement Unary Operator on Numeric Variable 
+	 * Add AbsoluteValue, Plus, Minus, Increment or Decrement Unary Operator on Numeric Variable 
 	 */
 	@Override
 	public void process(CtVariableRead candidate) {
@@ -73,7 +79,6 @@ public class NumericExpressionMetaMutator
 	private String UnaryEquivalent(UNARY value) {
 		switch(value) {
 		case ABS : return "Math.abs(";
-		case PLUS : return "+(";
 		case MINUS : return "-(";
 		case INC : return "(++";
 		case DEC : return "(--";
