@@ -6,8 +6,10 @@ import java.util.EnumSet;
 
 import spoon.processing.AbstractProcessor;
 import spoon.reflect.code.CtCodeSnippetExpression;
+import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtVariableRead;
 import spoon.reflect.declaration.ModifierKind;
+import spoon.reflect.reference.CtVariableReference;
 
 /**
  * inserts a mutation hotspot for each Numeric Variable
@@ -37,23 +39,32 @@ public class NumericExpressionMetaMutator
 	 */
 	@Override
 	public boolean isToBeProcessed(CtVariableRead candidate) {
-	
+		System.out.println(candidate.getSignature());
 		// SKIP not declared variable and Finale variable
 		if(candidate.getVariable() == null) return false;
-		candidate.getVariable();
+		System.out.println("Not null variable");
 		if(candidate.getVariable().getModifiers().contains(ModifierKind.FINAL)) return false;
-		
-		ArrayList<String> valideType = new ArrayList<String>();
-		valideType.add("java.lang.Integer");
-		valideType.add("java.lang.Double");
-		valideType.add("java.lang.Float");
-		valideType.add("java.lang.Long");
-		
+		System.out.println("Not FINAL");
 		candidate.getVariable().getType();
-		if(valideType.contains(candidate.getVariable().getType().toString())){
+		if(this.isNumber(candidate.getVariable())){
+			System.out.println("spooned");
 			return true;
 		}
 		return false;
+	}
+	/**
+	 * 
+	 * @param ctVariableReference
+	 * @return
+	 */
+	private boolean isNumber(CtVariableReference ctVariableReference) {
+		return ctVariableReference.getType().getSimpleName().equals("int")
+			|| ctVariableReference.getType().getSimpleName().equals("long")
+			|| ctVariableReference.getType().getSimpleName().equals("byte")
+			|| ctVariableReference.getType().getSimpleName().equals("char")
+		|| ctVariableReference.getType().getSimpleName().equals("float")
+		|| ctVariableReference.getType().getSimpleName().equals("double")
+		|| Number.class.isAssignableFrom(ctVariableReference.getType().getActualClass());
 	}
 	
 	/**
