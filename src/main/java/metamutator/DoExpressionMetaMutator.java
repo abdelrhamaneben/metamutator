@@ -15,12 +15,13 @@ public class DoExpressionMetaMutator
 
 	public static final String PREFIX = "_doExpressionMetaMutator";
 	public enum NbRound {
+		NoRound,
 		Rounds3,
 		Rounds100
 		
 	};
 	private static final EnumSet<NbRound> roundsSet = EnumSet
-			.of(NbRound.Rounds3, NbRound.Rounds100);
+			.of(NbRound.NoRound,NbRound.Rounds3, NbRound.Rounds100);
 	
 	public static int thisIndex = 0;
 	
@@ -38,6 +39,7 @@ public class DoExpressionMetaMutator
 		
 		String expression2 = "if((" + PREFIX + thisIndex + ".is(\""+NbRound.Rounds3.toString() + "\")) && "+ constanteName +" == 3) "
 							+ "{break;}"
+							+ "if((" + PREFIX + thisIndex + ".is(\""+NbRound.NoRound.toString() + "\"))) { break;}"
 							+ "else if("+ constanteName +" == 100){break;}"
 							+ " "+ constanteName +"++";
 		CtCodeSnippetStatement ifRoundStatement = getFactory().Core()
@@ -46,6 +48,6 @@ public class DoExpressionMetaMutator
 		
 		candidate.insertBefore(DeclareRoundStatement);
 		candidate.getBody().insertAfter(ifRoundStatement);
-		Selector.generateSelector(candidate, NbRound.Rounds3.toString(), thisIndex, roundsSet, PREFIX);
+		Selector.generateSelector(candidate, NbRound.NoRound.toString(), thisIndex, roundsSet, PREFIX);
 	}
 }
