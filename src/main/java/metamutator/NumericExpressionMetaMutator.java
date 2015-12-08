@@ -8,6 +8,7 @@ import spoon.processing.AbstractProcessor;
 import spoon.reflect.code.CtCodeSnippetExpression;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtVariableRead;
+import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.ModifierKind;
 import spoon.reflect.reference.CtVariableReference;
 
@@ -39,16 +40,13 @@ public class NumericExpressionMetaMutator
 	 */
 	@Override
 	public boolean isToBeProcessed(CtVariableRead candidate) {
-		System.out.println(candidate.getSignature());
+		
 		// SKIP not declared variable and Finale variable
 		if(candidate.getVariable() == null) return false;
-		System.out.println("Not null variable");
 		if(candidate.getVariable().getModifiers().contains(ModifierKind.FINAL)) return false;
-		
-		System.out.println("Not FINAL");
 		candidate.getVariable().getType();
 		if(this.isNumber(candidate.getVariable())){
-			System.out.println("spooned");
+			System.out.println(candidate.getSignature());
 			return true;
 		}
 		return false;
@@ -80,7 +78,7 @@ public class NumericExpressionMetaMutator
 			if(unary.equals(UNARY.INIT)) continue;
 			expression += PREFIX+thisIndex + ".is(\"" + unary.toString() + "\")?( " + UnaryEquivalent(unary)  + candidate.toString() + ")):";
 		}
-		expression += "(" + candidate.getVariable().getSimpleName() + "))";
+		expression += "(" + candidate.toString() + "))";
 		CtCodeSnippetExpression<Boolean> codeSnippet = getFactory().Core()
 				.createCodeSnippetExpression();
 		codeSnippet.setValue(expression);

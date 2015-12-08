@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import metamutator.BinaryOperatorMetaMutator;
-import metamutator.DoExpressionMetaMutator;
+import metamutator.LoopExpressionMetaMutator;
 import metamutator.NumericExpressionMetaMutator;
 import metamutator.Selector;
 
@@ -17,14 +17,14 @@ import spoon.reflect.visitor.filter.TypeFilter;
 import bsh.Interpreter;
 import static org.apache.commons.lang.reflect.MethodUtils.*;
 
-public class DoExpressionMetaMutatorTest {
+public class LoopExpressionMetaMutatorTest {
 
     @Test
-    public void testDoExpressionMetaMutator() throws Exception {
+    public void testLoopExpressionMetaMutator() throws Exception {
         // build the model and apply the transformation
         Launcher l = new Launcher();
         l.addInputResource("src/test/java/Foo.java");
-        l.addProcessor(new DoExpressionMetaMutator());
+        l.addProcessor(new LoopExpressionMetaMutator());
         l.run();
 
         // now we get the code of Foo
@@ -39,7 +39,7 @@ public class DoExpressionMetaMutatorTest {
         // creating a new instance of the class
         Object o = ((Class)bsh.eval(c.toString())).newInstance();
         
-        Selector sel1=Selector.getSelectorByName( DoExpressionMetaMutator.PREFIX + "1");
+        Selector sel1=Selector.getSelectorByName( LoopExpressionMetaMutator.PREFIX + "1");
         sel1.choose(0);// NO ROUND
         assertEquals(1, invokeExactMethod(o, "sum", new Object[] {15}));  
         sel1.choose(1);// ROUNDS 3

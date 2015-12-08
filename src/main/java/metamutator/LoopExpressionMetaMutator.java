@@ -6,12 +6,13 @@ import spoon.processing.AbstractProcessor;
 
 import spoon.reflect.code.CtCodeSnippetStatement;
 import spoon.reflect.code.CtDo;
+import spoon.reflect.code.CtLoop;
 
 /**
  * inserts a mutation hotspot for DO statement
  */
-public class DoExpressionMetaMutator 
-				extends AbstractProcessor<CtDo> {
+public class LoopExpressionMetaMutator 
+				extends AbstractProcessor<CtLoop> {
 
 	public static final String PREFIX = "_doExpressionMetaMutator";
 	public enum NbRound {
@@ -29,7 +30,7 @@ public class DoExpressionMetaMutator
 	 * Stop Do loop on 3 or 100 Rounds
 	 */
 	@Override
-	public void process(CtDo candidate) {
+	public void process(CtLoop candidate) {
 		thisIndex++;
 		String constanteName = "_doExpressionMetaMutator"+thisIndex+"_Constante";
 		String expression = "int "+ constanteName +" = 1";
