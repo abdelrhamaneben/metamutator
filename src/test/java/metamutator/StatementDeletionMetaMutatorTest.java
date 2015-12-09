@@ -1,27 +1,28 @@
 package metamutator;
+
 import static org.apache.commons.lang.reflect.MethodUtils.invokeExactMethod;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+import bsh.Interpreter;
 import spoon.Launcher;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.visitor.filter.NameFilter;
-import bsh.Interpreter;
 
-public class BinaryOperatorMetaMutatorTest {
+public class StatementDeletionMetaMutatorTest {
 
     @Test
-    public void testBinaryOperatorMetaMutator() throws Exception {
+    public void testStatementDeletionMetaMutator() throws Exception {
         // build the model and apply the transformation
         Launcher l = new Launcher();
-        l.addInputResource("src/test/java/resources/Foo.java");
-        l.addProcessor(new BinaryOperatorMetaMutator());
+        l.addInputResource("src/test/java/resources/Bar.java");
+        l.addProcessor(new StatementDeletionMetaMutator());
         l.run();
 
         // now we get the code of Foo
-        CtClass c = (CtClass) l.getFactory().Package().getRootPackage().getElements(new NameFilter("Foo")).get(0);
+        CtClass c = (CtClass) l.getFactory().Package().getRootPackage().getElements(new NameFilter("Bar")).get(0);
         
         // printing the metaprogram
         System.out.println("// Metaprogram: ");
@@ -35,12 +36,15 @@ public class BinaryOperatorMetaMutatorTest {
 
         // creating a new instance of the class
         Object o = ((Class)bsh.eval(c.toString())).newInstance();        
-        assertEquals(3,Selector.getAllSelectors().size());
+        assertEquals(1,Selector.getAllSelectors().size());
         
         // test with the first
-        Selector sel=Selector.getSelectorByName(BinaryOperatorMetaMutator.PREFIX + "1");
+        Selector sel=Selector.getSelectorByName(StatementDeletionMetaMutator.PREFIX + "1");
         
-        // the initial version is OR
+        
+        //TO MODIFY
+        
+        /*// the initial version is OR
         assertEquals(true, invokeExactMethod(o, "op", new Object[] {Boolean.TRUE, Boolean.FALSE}));
 
         // now we activate the first metamutation (the initial OR)
@@ -72,7 +76,7 @@ public class BinaryOperatorMetaMutatorTest {
         assertEquals(true, invokeExactMethod(o, "op2", new Object[] {4, 3}));
         sel1.choose(3); // LT
         assertEquals(false, invokeExactMethod(o, "op2", new Object[] {3, 3}));
-        assertEquals(true, invokeExactMethod(o, "op2", new Object[] {3, 4}));        
+        assertEquals(true, invokeExactMethod(o, "op2", new Object[] {3, 4}));        */
         
     }
 }
