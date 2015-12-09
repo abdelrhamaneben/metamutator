@@ -14,7 +14,8 @@ public class Foo {
 	}
 	
 	public int add(Integer a, Integer b) {
-		return a + b;
+		int c = a + b;
+		return c;
 	}
 
 	public int sum(Integer a) {

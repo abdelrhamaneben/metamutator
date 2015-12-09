@@ -1,11 +1,7 @@
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
-import java.util.List;
 
-import metamutator.BinaryOperatorMetaMutator;
 import metamutator.LoopExpressionMetaMutator;
-import metamutator.NumericExpressionMetaMutator;
 import metamutator.Selector;
 
 import org.junit.Test;
@@ -13,7 +9,6 @@ import org.junit.Test;
 import spoon.Launcher;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.visitor.filter.NameFilter;
-import spoon.reflect.visitor.filter.TypeFilter;
 import bsh.Interpreter;
 import static org.apache.commons.lang.reflect.MethodUtils.*;
 

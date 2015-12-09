@@ -10,15 +10,24 @@ import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtVariableRead;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.ModifierKind;
+import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.reference.CtVariableReference;
+import spoon.support.reflect.code.CtBinaryOperatorImpl;
+import spoon.support.reflect.code.CtUnaryOperatorImpl;
 
 /**
  * inserts a mutation hotspot for each Numeric Variable
+ * @author abdelrhamanebenhammou
+ *
  */
-public class NumericExpressionMetaMutator 
+public class NumericVariableMetaMutator 
 				extends AbstractProcessor<CtVariableRead> {
 
 	public static final String PREFIX = "_numericExpressionMetaMutator";
+	
+	/**
+	 * 
+	 */
 	public enum UNARY {
 		// NO CHANGE
 		INIT,
@@ -34,7 +43,11 @@ public class NumericExpressionMetaMutator
 	private static final EnumSet<UNARY> absSet = EnumSet
 			.of(UNARY.ABS, UNARY.MINUS, UNARY.INC, UNARY.DEC);
 	
+	/**
+	 * 
+	 */
 	public static int thisIndex = 0;
+	
 	/**
 	 * Accept Numeric Variable
 	 */
@@ -44,9 +57,20 @@ public class NumericExpressionMetaMutator
 		// SKIP not declared variable and Finale variable
 		if(candidate.getVariable() == null) return false;
 		if(candidate.getVariable().getModifiers().contains(ModifierKind.FINAL)) return false;
-		candidate.getVariable().getType();
-		if(this.isNumber(candidate.getVariable())){
-			System.out.println(candidate.getSignature());
+		
+		
+		// SKIP IF VARIABLE IS CASTED
+		if(candidate.getTypeCasts().size() > 0) return false;
+		for(CtTypeReference type : candidate.getReferencedTypes()) {
+			if(!this.isNumber(type)) return false;
+		}
+		
+		if( candidate.getParent().getClass().equals(CtUnaryOperatorImpl.class)) return false;
+		
+		if(this.isNumber(candidate.getVariable().getType())){
+			System.out.println(candidate);
+			System.out.println(candidate.getParent());
+			System.out.println(candidate.getParent().getClass());
 			return true;
 		}
 		return false;
@@ -56,14 +80,12 @@ public class NumericExpressionMetaMutator
 	 * @param ctVariableReference
 	 * @return
 	 */
-	private boolean isNumber(CtVariableReference ctVariableReference) {
-		return ctVariableReference.getType().getSimpleName().equals("int")
-			|| ctVariableReference.getType().getSimpleName().equals("long")
-			|| ctVariableReference.getType().getSimpleName().equals("byte")
-			|| ctVariableReference.getType().getSimpleName().equals("char")
-		|| ctVariableReference.getType().getSimpleName().equals("float")
-		|| ctVariableReference.getType().getSimpleName().equals("double")
-		|| Number.class.isAssignableFrom(ctVariableReference.getType().getActualClass());
+	private boolean isNumber(CtTypeReference type) {
+		return type.getSimpleName().equals("int")
+			|| type.getSimpleName().equals("long")
+			|| type.getSimpleName().equals("byte")
+		|| type.getSimpleName().equals("float")
+		|| type.getSimpleName().equals("double");
 	}
 	
 	/**
@@ -86,6 +108,11 @@ public class NumericExpressionMetaMutator
 		Selector.generateSelector(candidate, UNARY.INIT.toString(), thisIndex, absSet, PREFIX);
 	}
 	
+	/**
+	 * 
+	 * @param value
+	 * @return
+	 */
 	private String UnaryEquivalent(UNARY value) {
 		switch(value) {
 		case ABS : return "Math.abs(";

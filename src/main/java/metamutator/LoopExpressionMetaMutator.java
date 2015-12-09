@@ -1,5 +1,5 @@
 package metamutator;
-
+import spoon.reflect.visitor.Filter;
 import java.util.EnumSet;
 
 import spoon.processing.AbstractProcessor;
@@ -7,7 +7,10 @@ import spoon.processing.AbstractProcessor;
 import spoon.reflect.code.CtCodeSnippetStatement;
 import spoon.reflect.code.CtDo;
 import spoon.reflect.code.CtLoop;
-
+import spoon.reflect.code.CtVariableRead;
+import spoon.reflect.declaration.CtElement;
+import spoon.reflect.visitor.filter.ReturnOrThrowFilter;
+import spoon.reflect.code.CtCFlowBreak;
 /**
  * inserts a mutation hotspot for DO statement
  */
@@ -39,9 +42,11 @@ public class LoopExpressionMetaMutator
 		DeclareRoundStatement.setValue(expression);
 		
 		String expression2 = "if((" + PREFIX + thisIndex + ".is(\""+NbRound.Rounds3.toString() + "\")) && "+ constanteName +" == 3) "
-							+ "{break;}"
-							+ "if((" + PREFIX + thisIndex + ".is(\""+NbRound.NoRound.toString() + "\"))) { break;}"
-							+ "else if("+ constanteName +" == 100){break;}"
+							+ "{" + this.breakOrReturn(candidate) + "}"
+							+ "else if((" + PREFIX + thisIndex + ".is(\""+NbRound.NoRound.toString() + "\"))) "
+							+ "{" + this.breakOrReturn(candidate) + "}"
+							+ "else if("+ constanteName +" == 100)"
+							+ "{" + this.breakOrReturn(candidate) + "}"
 							+ " "+ constanteName +"++";
 		CtCodeSnippetStatement ifRoundStatement = getFactory().Core()
 				.createCodeSnippetStatement();
@@ -50,5 +55,14 @@ public class LoopExpressionMetaMutator
 		candidate.insertBefore(DeclareRoundStatement);
 		candidate.getBody().insertAfter(ifRoundStatement);
 		Selector.generateSelector(candidate, NbRound.NoRound.toString(), thisIndex, roundsSet, PREFIX);
+	}
+	
+	private String breakOrReturn(CtLoop candidate) {
+		Filter<CtCFlowBreak> filter = new ReturnOrThrowFilter();
+		if(candidate.getBody().getElements(filter).size() > 0) {
+			return candidate.getBody().getElements(filter).get(0).toString() + ";";
+		}else {
+			return "break;";
+		}
 	}
 }
