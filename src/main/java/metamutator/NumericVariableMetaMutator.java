@@ -68,9 +68,6 @@ public class NumericVariableMetaMutator
 		if( candidate.getParent().getClass().equals(CtUnaryOperatorImpl.class)) return false;
 		
 		if(this.isNumber(candidate.getVariable().getType())){
-			System.out.println(candidate);
-			System.out.println(candidate.getParent());
-			System.out.println(candidate.getParent().getClass());
 			return true;
 		}
 		return false;
