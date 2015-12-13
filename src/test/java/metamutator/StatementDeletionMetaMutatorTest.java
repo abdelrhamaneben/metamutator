@@ -4,6 +4,8 @@ import static org.apache.commons.lang.reflect.MethodUtils.invokeExactMethod;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import bsh.Interpreter;
@@ -12,10 +14,11 @@ import spoon.reflect.declaration.CtClass;
 import spoon.reflect.visitor.filter.NameFilter;
 
 public class StatementDeletionMetaMutatorTest {
-
-    @Test
-    public void testStatementDeletionMetaMutator() throws Exception {
-        // build the model and apply the transformation
+	
+	static Object o;
+	
+	@BeforeClass
+	public static void initObject() throws Exception{
         Launcher l = new Launcher();
         l.addInputResource("src/test/java/resources/Bar.java");
         l.addProcessor(new StatementDeletionMetaMutator());
@@ -35,9 +38,12 @@ public class StatementDeletionMetaMutatorTest {
         assertEquals(0,Selector.getAllSelectors().size());
 
         // creating a new instance of the class
-        Object o = ((Class)bsh.eval(c.toString())).newInstance();        
+        o = ((Class)bsh.eval(c.toString())).newInstance();        
         assertEquals(10,Selector.getAllSelectors().size());
-        
+	}
+	
+    @Test
+    public void testSwitchDeletionMetaMutator() throws Exception {  
         // test with the first (SWITCH DELETION)
         Selector sel1=Selector.getSelectorByName(StatementDeletionMetaMutator.PREFIX + "1");
         assertEquals('C', invokeExactMethod(o, "returnLetterFromSwitchCase", new Object[] {3}));
@@ -51,7 +57,10 @@ public class StatementDeletionMetaMutatorTest {
             fail();
         }
         catch (IllegalArgumentException expected){}
-        
+    }
+	
+    @Test
+    public void testIfDeletionMetaMutator() throws Exception {  
         //IF DELETION
         Selector sel5=Selector.getSelectorByName(StatementDeletionMetaMutator.PREFIX + "5");
         assertEquals(10, invokeExactMethod(o, "returnMax10", new Object[] {13}));
@@ -64,7 +73,10 @@ public class StatementDeletionMetaMutatorTest {
             fail();
         }
         catch (IllegalArgumentException expected){} 
-        
+    }
+	
+    @Test
+    public void testDoDeletionMetaMutator() throws Exception {   
         //DO DELETION
         Selector sel6=Selector.getSelectorByName(StatementDeletionMetaMutator.PREFIX + "6");
         assertEquals(18, invokeExactMethod(o, "returnTotalFromDo", new Object[] {18}));
@@ -77,7 +89,10 @@ public class StatementDeletionMetaMutatorTest {
             fail();
         }
         catch (IllegalArgumentException expected){}
-        
+    }
+	
+    @Test
+    public void testForDeletionMetaMutator() throws Exception {
         //FOR DELETION
         Selector sel7=Selector.getSelectorByName(StatementDeletionMetaMutator.PREFIX + "7");
         assertEquals(18, invokeExactMethod(o, "returnTotalFromFor", new Object[] {18}));
@@ -91,7 +106,10 @@ public class StatementDeletionMetaMutatorTest {
         }
         catch (IllegalArgumentException expected){}
         
-        
+    }
+	
+    @Test
+    public void testWhileDeletionMetaMutator() throws Exception {
         //WHILE DELETION
         Selector sel8=Selector.getSelectorByName(StatementDeletionMetaMutator.PREFIX + "8");
         assertEquals(18, invokeExactMethod(o, "returnTotalFromWhile", new Object[] {18}));
@@ -105,7 +123,10 @@ public class StatementDeletionMetaMutatorTest {
         }
         catch (IllegalArgumentException expected){}
                 
-        
+    }
+	
+    @Test
+    public void testForEachDeletionMetaMutator() throws Exception {
       //FOREACH DELETION
         Selector sel9=Selector.getSelectorByName(StatementDeletionMetaMutator.PREFIX + "9");
         assertEquals(13, invokeExactMethod(o, "returntotalFromForEachFromArray", new Object[] {new int[]{2,5,6}}));
