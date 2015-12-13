@@ -36,47 +36,90 @@ public class StatementDeletionMetaMutatorTest {
 
         // creating a new instance of the class
         Object o = ((Class)bsh.eval(c.toString())).newInstance();        
-        assertEquals(1,Selector.getAllSelectors().size());
+        assertEquals(10,Selector.getAllSelectors().size());
         
-        // test with the first
-        Selector sel=Selector.getSelectorByName(StatementDeletionMetaMutator.PREFIX + "1");
+        // test with the first (SWITCH DELETION)
+        Selector sel1=Selector.getSelectorByName(StatementDeletionMetaMutator.PREFIX + "1");
+        assertEquals('C', invokeExactMethod(o, "returnLetterFromSwitchCase", new Object[] {3}));
+        sel1.choose(0);
+        assertEquals('C', invokeExactMethod(o, "returnLetterFromSwitchCase", new Object[] {3}));
+        sel1.choose(1);
+        assertEquals('\u0000', invokeExactMethod(o, "returnLetterFromSwitchCase", new Object[] {3}));
         
-        
-        //TO MODIFY
-        
-        /*// the initial version is OR
-        assertEquals(true, invokeExactMethod(o, "op", new Object[] {Boolean.TRUE, Boolean.FALSE}));
-
-        // now we activate the first metamutation (the initial OR)
-        sel.choose(0);
-        assertEquals(true, invokeExactMethod(o, "op", new Object[] {Boolean.TRUE, Boolean.FALSE}));
-        
-        // now we activate the second metamutation (AND)
-        // and the expected result is false
-        sel.choose(1);
-        assertEquals(false, invokeExactMethod(o, "op", new Object[] {Boolean.TRUE, Boolean.FALSE}));
-        
-        // impossible option
         try {
-            sel.choose(2);
+            sel1.choose(2);
             fail();
         }
         catch (IllegalArgumentException expected){}
-
-        // test with the second mutation hotspot
-        Selector sel1=Selector.getSelectorByName( BinaryOperatorMetaMutator.PREFIX + "2");
-        sel1.choose(0);// GT
-        assertEquals(false, invokeExactMethod(o, "op2", new Object[] {3, 3}));
-        assertEquals(true, invokeExactMethod(o, "op2", new Object[] {5, 4}));
-        sel1.choose(1); // EQ
-        assertEquals(true, invokeExactMethod(o, "op2", new Object[] {3, 3}));
-        assertEquals(false, invokeExactMethod(o, "op2", new Object[] {4, 3}));
-        sel1.choose(2); // NE
-        assertEquals(false, invokeExactMethod(o, "op2", new Object[] {3, 3}));
-        assertEquals(true, invokeExactMethod(o, "op2", new Object[] {4, 3}));
-        sel1.choose(3); // LT
-        assertEquals(false, invokeExactMethod(o, "op2", new Object[] {3, 3}));
-        assertEquals(true, invokeExactMethod(o, "op2", new Object[] {3, 4}));        */
+        
+        //IF DELETION
+        Selector sel5=Selector.getSelectorByName(StatementDeletionMetaMutator.PREFIX + "5");
+        assertEquals(10, invokeExactMethod(o, "returnMax10", new Object[] {13}));
+        sel5.choose(0);
+        assertEquals(10, invokeExactMethod(o, "returnMax10", new Object[] {13}));
+        sel5.choose(1);
+        assertEquals(0, invokeExactMethod(o, "returnMax10", new Object[] {13}));
+        try {
+            sel5.choose(2);
+            fail();
+        }
+        catch (IllegalArgumentException expected){} 
+        
+        //DO DELETION
+        Selector sel6=Selector.getSelectorByName(StatementDeletionMetaMutator.PREFIX + "6");
+        assertEquals(18, invokeExactMethod(o, "returnTotalFromDo", new Object[] {18}));
+        sel6.choose(0);
+        assertEquals(18, invokeExactMethod(o, "returnTotalFromDo", new Object[] {18}));
+        sel6.choose(1);
+        assertEquals(0, invokeExactMethod(o, "returnTotalFromDo", new Object[] {18}));
+        try {
+            sel6.choose(2);
+            fail();
+        }
+        catch (IllegalArgumentException expected){}
+        
+        //FOR DELETION
+        Selector sel7=Selector.getSelectorByName(StatementDeletionMetaMutator.PREFIX + "7");
+        assertEquals(18, invokeExactMethod(o, "returnTotalFromFor", new Object[] {18}));
+        sel7.choose(0);
+        assertEquals(18, invokeExactMethod(o, "returnTotalFromFor", new Object[] {18}));
+        sel7.choose(1);
+        assertEquals(0, invokeExactMethod(o, "returnTotalFromFor", new Object[] {18}));
+        try {
+            sel7.choose(2);
+            fail();
+        }
+        catch (IllegalArgumentException expected){}
+        
+        
+        //WHILE DELETION
+        Selector sel8=Selector.getSelectorByName(StatementDeletionMetaMutator.PREFIX + "8");
+        assertEquals(18, invokeExactMethod(o, "returnTotalFromWhile", new Object[] {18}));
+        sel8.choose(0);
+        assertEquals(18, invokeExactMethod(o, "returnTotalFromWhile", new Object[] {18}));
+        sel8.choose(1);
+        assertEquals(0, invokeExactMethod(o, "returnTotalFromWhile", new Object[] {18}));
+        try {
+            sel8.choose(2);
+            fail();
+        }
+        catch (IllegalArgumentException expected){}
+                
+        
+      //FOREACH DELETION
+        Selector sel9=Selector.getSelectorByName(StatementDeletionMetaMutator.PREFIX + "9");
+        assertEquals(13, invokeExactMethod(o, "returntotalFromForEachFromArray", new Object[] {new int[]{2,5,6}}));
+        sel9.choose(0);
+        assertEquals(13, invokeExactMethod(o, "returntotalFromForEachFromArray", new Object[] {new int[]{2,5,6}}));
+        sel9.choose(1);
+        assertEquals(0, invokeExactMethod(o, "returntotalFromForEachFromArray", new Object[] {new int[]{2,5,6}}));
+        try {
+            sel9.choose(2);
+            fail();
+        }
+        catch (IllegalArgumentException expected){}
         
     }
+    
+
 }

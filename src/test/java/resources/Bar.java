@@ -1,38 +1,13 @@
 package resources;
 
-import metamutator.Selector;
-
 public class Bar {
 	
-	private int number;
-	private String sentence;
-	private boolean bool;
-
 	
 	public Bar(){
 		
 	}
 	
-	public Bar(int n, String s, boolean b){
-		this.number =n;
-		this.sentence =s;
-		this.bool = b;
-	}
-	
-	public boolean addition(int b){
-		int other = 10;
-		other = other + b;
-		if(other > 20){
-			sentence = "other sup";
-		}
-		else{
-			sentence = "other sub";
-		}
-		
-		return b == number;
-	}
-	
-	public int returnMax10(int a) {
+	public int returnMax10(Integer a) {
 		if(a < 10){
 			return a;
 		}
@@ -41,8 +16,65 @@ public class Bar {
 		}
 	}
 	
-	public void ThrowException() throws Exception{
+	public void throwException() throws Exception{
 		throw new Exception();
 	}
 	
+	public int returnTotalFromFor(Integer total){
+		int i = 0;
+		for(i=0; i<total; i++){
+		}
+		return i;
+	}
+	
+	public int returnTotalFromWhile(Integer total){
+		int i = 0;
+		while(i<total){
+			i++;
+		}
+		return i;
+	}
+	
+	public int returnTotalFromDo(Integer total){
+		int i = 0;
+		do{
+			i++;
+		}
+		while(i < total);
+		return i;
+	}
+	
+	public int returntotalFromForEachFromArray(int[] array){
+		int total = 0;
+		for(int i : array){
+			total = total + i;
+		}
+		return total;
+	}
+	
+	
+	public char returnLetterFromSwitchCase(Integer i){
+		switch(i){
+		case 1 :
+			return 'A';
+		case 2 :
+			return 'B';
+		case 3 :
+			return 'C';
+		case 4 :
+			return 'D';
+		default :
+			return 'E';
+		}
+	}
+	
+	public int addWithoutNegative(int[] array){
+		int total = 0;
+		for(int i : array){
+			if(i < 0 ) continue;
+			total = total + i;
+		}
+		return total;
+	}
+
 }
