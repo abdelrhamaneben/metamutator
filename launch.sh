@@ -1,0 +1,5 @@
+cmd="java -cp ../commons-csv/target/test-classes:target/classes:spoon-core-4.4.1.jar:spooned:/home/m2iagl/dufaux/.m2/repository/com/google/collections/google-collections/1.0/google-collections-1.0.jar:/home/m2iagl/dufaux/.m2/repository/com/martiansoftware/jsap/2.1/jsap-2.1.jar:/home/m2iagl/dufaux/.m2/repository/commons-io/commons-io/1.3.2/commons-io-1.3.2.jar:/home/m2iagl/dufaux/.m2/repository/commons-lang/commons-lang/2.6/commons-lang-2.6.jar:/home/m2iagl/dufaux/.m2/repository/fr/inria/gforge/spoon/spoon-core/4.4.0/spoon-core-4.4.0.jar:/home/m2iagl/dufaux/.m2/repository/junit/junit/4.12/junit-4.12.jar:/home/m2iagl/dufaux/.m2/repository/log4j/log4j/1.2.17/log4j-1.2.17.jar:/home/m2iagl/dufaux/.m2/repository/org/beanshell/bsh/2.0b5/bsh-2.0b5.jar:/home/m2iagl/dufaux/.m2/repository/org/eclipse/jdt/org.eclipse.jdt.core/3.12.0.v20150913-1717/org.eclipse.jdt.core-3.12.0.v20150913-1717.jar:/home/m2iagl/dufaux/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar metamutator.Main"
+
+cmd="${cmd} ${1}"
+
+eval $cmd

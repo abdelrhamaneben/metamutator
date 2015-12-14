@@ -39,7 +39,7 @@ public class StatementDeletionMetaMutatorTest {
 
         // creating a new instance of the class
         o = ((Class)bsh.eval(c.toString())).newInstance();        
-        assertEquals(10,Selector.getAllSelectors().size());
+        assertEquals(11,Selector.getAllSelectors().size());
 	}
 	
     @Test
@@ -142,5 +142,21 @@ public class StatementDeletionMetaMutatorTest {
         
     }
     
+    @Test
+    public void testAssignmentInIf() throws Exception {
+      //FOREACH DELETION
+        Selector sel10=Selector.getSelectorByName(StatementDeletionMetaMutator.PREFIX + "10");
+        assertEquals("Bonjour", invokeExactMethod(o, "BonjourOrHello", new Object[] {true}));
+        sel10.choose(0);
+        assertEquals("Bonjour", invokeExactMethod(o, "BonjourOrHello", new Object[] {true}));
+        sel10.choose(1);
+        assertEquals(null, invokeExactMethod(o, "BonjourOrHello", new Object[] {true}));
+        try {
+            sel10.choose(2);
+            fail();
+        }
+        catch (IllegalArgumentException expected){}
+        
+    }  
 
 }

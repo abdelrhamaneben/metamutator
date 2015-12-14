@@ -77,4 +77,19 @@ public class Bar {
 		return total;
 	}
 
+
+	public String BonjourOrHello(Boolean french){
+		String hello;
+		if(french){
+			hello = "Bonjour";
+		}
+		else{
+			hello = "Hello";
+		}
+		return hello;
+	}
+	
+	/*public String LocalVariableNotReachableInElse(){
+		if()
+	}*/
 }

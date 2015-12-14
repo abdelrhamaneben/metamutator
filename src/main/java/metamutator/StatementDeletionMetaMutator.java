@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.eclipse.jdt.internal.compiler.lookup.MethodVerifier;
+
 import com.google.common.collect.Sets;
 
 import spoon.processing.AbstractProcessor;
@@ -34,7 +37,6 @@ import spoon.reflect.code.CtStatement;
 import spoon.reflect.code.CtSwitch;
 import spoon.reflect.code.CtSynchronized;
 import spoon.reflect.code.CtThrow;
-import spoon.reflect.code.CtTry;
 import spoon.reflect.code.CtUnaryOperator;
 import spoon.reflect.code.CtWhile;
 import spoon.reflect.declaration.CtClass;
@@ -42,9 +44,14 @@ import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtEnum;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.visitor.Filter;
+import spoon.reflect.visitor.ReferenceFilter;
+import spoon.reflect.visitor.filter.CompositeFilter;
+import spoon.reflect.visitor.filter.DirectReferenceFilter;
+import spoon.reflect.visitor.filter.FilteringOperator;
+import spoon.reflect.visitor.filter.ReferenceTypeFilter;
 import spoon.reflect.visitor.filter.ReturnOrThrowFilter;
-import spoon.support.reflect.code.CtExpressionImpl;
-import spoon.support.reflect.code.CtLambdaImpl;
+import spoon.reflect.visitor.filter.TypeFilter;
+import spoon.reflect.visitor.filter.VariableAccessFilter;
 import spoon.support.reflect.code.CtLiteralImpl;
 import spoon.reflect.code.CtAssert;
 import spoon.reflect.code.CtAssignment;
@@ -89,7 +96,7 @@ extends AbstractProcessor<CtStatement> {
 	
 	
 	//Templates of returned expressions, used when a function have a return in a statement which can be deleted.
-	private static final Map<Class, CtLiteral> returnedExpressions;
+	private static final Map<Class, CtLiteral> PrimitiveTemplateExpressions;
 	    static {
 	        HashMap<Class, CtLiteral> map = new HashMap<Class, CtLiteral>();
 	        map.put(byte.class, new CtLiteralImpl<Byte>().setValue(0));
@@ -101,7 +108,7 @@ extends AbstractProcessor<CtStatement> {
 	        map.put(boolean.class,new CtLiteralImpl<Boolean>().setValue(false));
 	        map.put(char.class,new CtLiteralImpl<Character>().setValue('\u0000'));
 	        map.put(void.class,null);
-	        returnedExpressions = Collections.unmodifiableMap(map);
+	        PrimitiveTemplateExpressions = Collections.unmodifiableMap(map);
 	    }
 
 	
@@ -124,18 +131,14 @@ extends AbstractProcessor<CtStatement> {
 	
 	private void mutateOperator(final CtStatement expression) {
 		
-
-		System.out.println("---------------------------------------------------------------------");
-		System.out.println(expression);
-		System.out.println("---------------------------------------------------------------------");
 		
-		if (alreadyInHotsSpot(expression)) {
+		/*if (alreadyInHotsSpot(expression)) {
 			System.out
 					.println(String
 							.format("Expression '%s' ignored because it is included in previous hot spot",
 									expression));
 			return;
-		}
+		}*/
 		int thisIndex = ++index;
 		
 		ACTIVABLE kind = ACTIVABLE.ENABLED;
@@ -161,42 +164,141 @@ extends AbstractProcessor<CtStatement> {
 		ifChoice.getParent().updateAllParentsBelow();
 		
 		//if there are return or throws, set else with value of return.
-		Filter<CtCFlowBreak> filter = new ReturnOrThrowFilter();
-		if(!thenBlock.getElements(filter).isEmpty()){
-			
-			//search the first parent method
-			CtElement parent = thenBlock.getParent();
-			while(parent != null && !(parent instanceof CtMethod)){
-				parent = parent.getParent();
-			}
-			//we go out of while with null of a CtMethod. If null, return without method in parents...?
-			if(parent == null){
-				return;
-			}
-			CtMethod parentMethod = (CtMethod) parent;
-
-			
-			CtLiteral returnedExpression = null;
-			Class classOfReturn = parentMethod.getType().getActualClass();
-			
-			if(returnedExpressions.containsKey(classOfReturn)){
-				CtLiteral templateExpression = returnedExpressions.get(classOfReturn);
-				returnedExpression = getFactory().Core().clone(templateExpression);
-			}else{
-				returnedExpression = new CtLiteralImpl().setValue(null);
-			}
-			
-			
-			CtReturn theReturn = getFactory().Core().createReturn();
-			theReturn.setReturnedExpression(returnedExpression);
-			ifChoice.setElseStatement(theReturn);
+		Filter<CtCFlowBreak> filterReturn = new ReturnOrThrowFilter();
+		if(!thenBlock.getElements(filterReturn).isEmpty()){
+			SetElseStatementWithReturn(ifChoice);
 		}
+
+		
+		//to avoid to delete assignement in statement, we assign a default value to all local variable.
+		Filter<CtLocalVariable> filterLocalVariable =  new TypeFilter(CtLocalVariable.class);
+		CtMethod method = ifChoice.getParent(CtMethod.class);
+		if(method != null && !method.getElements(filterLocalVariable).isEmpty()){
+			for(CtLocalVariable var : method.getElements(filterLocalVariable)){
+				if(var.getAssignment() == null){
+					//create right side expression from template.
+					Class classOfAssignment = var.getType().getActualClass();
+					CtLiteral rightHand = null;
+					
+					//Particular case of ForEach (int x : numbers) can't be (int x = 0 : numbers)
+					if(var.getParent() instanceof CtForEach){
+						continue;
+					}
+					if(PrimitiveTemplateExpressions.containsKey(classOfAssignment)){
+						CtLiteral templateExpression = PrimitiveTemplateExpressions.get(classOfAssignment);
+						rightHand = getFactory().Core().clone(templateExpression);
+					}else{
+						rightHand = new CtLiteralImpl().setValue(null);
+					}
+					var.setAssignment(rightHand);
+				}
+			}
+		}
+
+		/*Filter<CtAssignment> filterAssignment =  new TypeFilter(CtAssignment.class);
+		//CtMethod method = thenBlock.getParent(CtMethod.class);
+		if(!ifChoice.getElements(filterAssignment).isEmpty()){
+			SetElseStatementWithAssignments(ifChoice, ifChoice.getElements(filterAssignment));
+		}*/
 		
 		Selector.generateSelector(expression, ACTIVABLE.ENABLED, thisIndex, ActivableSet, PREFIX);
 		
-		hotSpots.add(expression);
+		//hotSpots.add(expression);
 
 	}
+	
+	/*
+	 * set else statement with return. 
+	 * This work only when the IfStatement contain a return.
+	 */
+	private void SetElseStatementWithReturn(CtIf ifStatement){
+		//search the first parent method
+		CtMethod parentMethod = ifStatement.getParent(CtMethod.class);
+		//we go out of while with null of a CtMethod. If null, return without method in parents...?
+		if(parentMethod == null){
+			return;
+		}
+
+		
+		//create returned expression from template.
+		CtLiteral returnedExpression = null;
+		Class classOfReturn = parentMethod.getType().getActualClass();
+		
+		if(PrimitiveTemplateExpressions.containsKey(classOfReturn)){
+			CtLiteral templateExpression = PrimitiveTemplateExpressions.get(classOfReturn);
+			returnedExpression = getFactory().Core().clone(templateExpression);
+		}else{
+			returnedExpression = new CtLiteralImpl().setValue(null);
+		}
+		
+		
+		CtReturn theReturn = getFactory().Core().createReturn();
+		theReturn.setReturnedExpression(returnedExpression);
+		CtBlock elseBlock = ifStatement.getElseStatement();
+		if(elseBlock == null){
+			elseBlock = getFactory().Core().createBlock();
+		}
+		elseBlock.addStatement(theReturn);
+		ifStatement.setElseStatement(elseBlock);
+	}
+	
+	
+	/*
+	 * Set Else statement with assignments with default values 
+	 * from a list of Assignments contained in the ifStatement
+	 */
+	/*private void SetElseStatementWithAssignments(CtIf ifStatement, List<CtAssignment> list){
+		Set<CtExpression> assigned = Sets.newHashSet();
+		
+		CtBlock elseBlock = ifStatement.getElseStatement();
+		if(elseBlock == null){
+			elseBlock = getFactory().Core().createBlock();
+		}
+		
+		for(CtAssignment element : list){
+			boolean localVariable = true;
+			CtMethod method = ifStatement.getParent(CtMethod.class);
+			Filter<CtLocalVariable> filterLocalVariable =  new TypeFilter(CtLocalVariable.class);
+			if(!ifStatement.getElements(filterLocalVariable).isEmpty()){
+				for(CtLocalVariable var : ifStatement.getElements(filterLocalVariable)){
+					//System.out.println(var);
+					ReferenceFilter refFilter = new DirectReferenceFilter(var.getReference());
+					//we find the real ref so this is a local variable
+					if(element.getAssigned().getReferences(refFilter).size() != 1){
+						localVariable = false;
+					}
+					//System.out.println(element.getAssigned().getReferences(refFilter));
+				}
+			}
+			
+			if(!localVariable){
+				continue;
+			}
+			
+			if(!assigned.contains(element.getAssigned())){
+				assigned.add(element.getAssigned());
+
+				CtAssignment assignment = getFactory().Core().clone(element);
+				
+				//create right side expression from template.
+				Class classOfAssignment = assignment.getType().getActualClass();
+				CtLiteral rightHand = null;
+				
+				if(PrimitiveTemplateExpressions.containsKey(classOfAssignment)){
+					CtLiteral templateExpression = PrimitiveTemplateExpressions.get(classOfAssignment);
+					rightHand = getFactory().Core().clone(templateExpression);
+				}else{
+					rightHand = new CtLiteralImpl().setValue(null);
+				}
+				
+				assignment.setAssignment(rightHand);
+				elseBlock.insertBegin(assignment);
+
+			}
+			
+		}
+		ifStatement.setElseStatement(elseBlock);
+	}*/
 	
 	private boolean alreadyInHotsSpot(CtElement element) {
 		CtElement parent = element.getParent();
