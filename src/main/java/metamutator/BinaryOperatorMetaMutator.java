@@ -125,15 +125,15 @@ public class BinaryOperatorMetaMutator extends
 			return;
 		}
 
-		
+		int thisIndex = ++index;
 
-		String originalKind = expression.getKind().toString();
+		BinaryOperatorKind originalKind = expression.getKind();
 		String newExpression = operators
 				.stream()
 				.map(kind -> {
 					expression.setKind(kind);
-					return String.format("("+ PREFIX + "%s.is(\"%s\") && (%s))",
-							index, kind, expression);
+					return String.format("("+ PREFIX + "%s.is(%s) && (%s))",
+							thisIndex, kind.getDeclaringClass().getName()+"."+kind.name(), expression);
 				}).collect(Collectors.joining(" || "));
 
 		CtCodeSnippetExpression<Boolean> codeSnippet = getFactory().Core()
@@ -142,8 +142,8 @@ public class BinaryOperatorMetaMutator extends
 
 		expression.replace(codeSnippet);
 		expression.replace(expression);
-		Selector.generateSelector(expression, originalKind, index, operators, PREFIX);
-		index++;
+		Selector.generateSelector(expression, originalKind, thisIndex, operators, PREFIX);
+
 		hostSpots.add(expression);
 
 	}
