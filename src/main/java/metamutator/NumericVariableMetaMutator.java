@@ -95,14 +95,16 @@ public class NumericVariableMetaMutator
 		String expression = "(";
 		for(UNARY unary : absSet){
 			if(unary.equals(UNARY.INIT)) continue;
-			expression += PREFIX+thisIndex + ".is(\"" + unary.toString() + "\")?( " + UnaryEquivalent(unary)  + candidate.toString() + ")):";
+			/*expression += PREFIX+thisIndex + ".is(\"" + unary.toString() + "\")?( " + UnaryEquivalent(unary)  + candidate.toString() + ")):";*/
+			expression += PREFIX+thisIndex + ".is(" + unary.getClass().getCanonicalName()+'.'+unary.toString()+ ")?( " + UnaryEquivalent(unary)  + candidate.getVariable().getSimpleName() + ")):";
 		}
 		expression += "(" + candidate.toString() + "))";
 		CtCodeSnippetExpression<Boolean> codeSnippet = getFactory().Core()
 				.createCodeSnippetExpression();
 		codeSnippet.setValue(expression);
 		candidate.replace(codeSnippet);
-		Selector.generateSelector(candidate, UNARY.INIT.toString(), thisIndex, absSet, PREFIX);
+		
+		Selector.generateSelector(candidate, UNARY.INIT, thisIndex, absSet, PREFIX);
 	}
 	
 	/**

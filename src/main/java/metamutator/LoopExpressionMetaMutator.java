@@ -41,9 +41,12 @@ public class LoopExpressionMetaMutator
 				.createCodeSnippetStatement();
 		DeclareRoundStatement.setValue(expression);
 		
-		String expression2 = "if((" + PREFIX + thisIndex + ".is(\""+NbRound.Rounds3.toString() + "\")) && "+ constanteName +" == 3) "
+		
+		
+		
+		String expression2 = "if((" + PREFIX + thisIndex + ".is("+  NbRound.Rounds3.getClass().getCanonicalName() + '.' + NbRound.Rounds3.toString() + ")) && "+ constanteName +" == 3) "
 							+ "{" + this.breakOrReturn(candidate) + "}"
-							+ "else if((" + PREFIX + thisIndex + ".is(\""+NbRound.NoRound.toString() + "\"))) "
+							+ "else if((" + PREFIX + thisIndex + ".is("+NbRound.NoRound.getClass().getCanonicalName() + '.' + NbRound.NoRound.toString() + "))) "
 							+ "{" + this.breakOrReturn(candidate) + "}"
 							+ "else if("+ constanteName +" == 100)"
 							+ "{" + this.breakOrReturn(candidate) + "}"
@@ -54,7 +57,7 @@ public class LoopExpressionMetaMutator
 		
 		candidate.insertBefore(DeclareRoundStatement);
 		candidate.getBody().insertAfter(ifRoundStatement);
-		Selector.generateSelector(candidate, NbRound.NoRound.toString(), thisIndex, roundsSet, PREFIX);
+		Selector.generateSelector(candidate, NbRound.NoRound, thisIndex, roundsSet, PREFIX);
 	}
 	
 	private String breakOrReturn(CtLoop candidate) {
