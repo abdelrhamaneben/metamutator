@@ -14,6 +14,7 @@ import spoon.reflect.code.CtVariableRead;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.ModifierKind;
 import spoon.reflect.reference.CtFieldReference;
+import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.reference.CtVariableReference;
 import spoon.reflect.visitor.filter.NameFilter;
 import spoon.reflect.visitor.filter.TypeFilter;
@@ -61,5 +62,28 @@ public class NumericExpressionMetaMutatorTest {
         CtVariableRead candidate = l.getFactory().Core().createVariableRead();
         // Fail On NOT declared variable
         assertEquals(false,numericPROC.isToBeProcessed(candidate));
+        
+        // TEST IsNumeric() on typeReference
+        // TEST GOOD TYPE
+        CtTypeReference type =  l.getFactory().Core().createTypeReference().setSimpleName(int.class.getName());
+        assertEquals(true,numericPROC.isNumber(type));
+        type =  l.getFactory().Core().createTypeReference().setSimpleName(long.class.getName());
+        assertEquals(true,numericPROC.isNumber(type));
+        type =  l.getFactory().Core().createTypeReference().setSimpleName(byte.class.getName());
+        assertEquals(true,numericPROC.isNumber(type));
+        type =  l.getFactory().Core().createTypeReference().setSimpleName(float.class.getName());
+        assertEquals(true,numericPROC.isNumber(type));
+        type =  l.getFactory().Core().createTypeReference().setSimpleName(double.class.getName());
+        assertEquals(true,numericPROC.isNumber(type));
+        
+        // TEST NOT ALLOW TYPE
+        type =  l.getFactory().Core().createTypeReference().setSimpleName(String.class.getName());
+        assertEquals(false,numericPROC.isNumber(type));
+        type =  l.getFactory().Core().createTypeReference().setSimpleName(boolean.class.getName());
+        assertEquals(false,numericPROC.isNumber(type));
+        type =  l.getFactory().Core().createTypeReference().setSimpleName(Object.class.getName());
+        assertEquals(false,numericPROC.isNumber(type));
+        type =  l.getFactory().Core().createTypeReference().setSimpleName(List.class.getName());
+        assertEquals(false,numericPROC.isNumber(type));
     }
 }

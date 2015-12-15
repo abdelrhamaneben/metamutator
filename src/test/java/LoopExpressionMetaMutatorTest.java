@@ -7,6 +7,8 @@ import metamutator.Selector;
 import org.junit.Test;
 
 import spoon.Launcher;
+import spoon.reflect.code.CtCodeSnippetStatement;
+import spoon.reflect.code.CtWhile;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.visitor.filter.NameFilter;
 import bsh.Interpreter;
@@ -40,6 +42,6 @@ public class LoopExpressionMetaMutatorTest {
         sel1.choose(1);// ROUNDS 3
         assertEquals(3, invokeExactMethod(o, "sum", new Object[] {15}));  
         sel1.choose(2);// ROUNDS 100
-        assertEquals(100, invokeExactMethod(o, "sum", new Object[] {150}));   
+        assertEquals(100, invokeExactMethod(o, "sum", new Object[] {150}));
     }
 }

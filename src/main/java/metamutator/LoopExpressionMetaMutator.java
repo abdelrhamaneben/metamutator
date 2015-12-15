@@ -60,7 +60,7 @@ public class LoopExpressionMetaMutator
 		Selector.generateSelector(candidate, NbRound.NoRound, thisIndex, roundsSet, PREFIX);
 	}
 	
-	private String breakOrReturn(CtLoop candidate) {
+	public String breakOrReturn(CtLoop candidate) {
 		Filter<CtCFlowBreak> filter = new ReturnOrThrowFilter();
 		if(candidate.getBody().getElements(filter).size() > 0) {
 			return candidate.getBody().getElements(filter).get(0).toString() + ";";

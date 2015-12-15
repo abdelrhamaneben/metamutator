@@ -77,7 +77,7 @@ public class NumericVariableMetaMutator
 	 * @param ctVariableReference
 	 * @return
 	 */
-	private boolean isNumber(CtTypeReference type) {
+	public boolean isNumber(CtTypeReference type) {
 		return type.getSimpleName().equals("int")
 			|| type.getSimpleName().equals("long")
 			|| type.getSimpleName().equals("byte")
