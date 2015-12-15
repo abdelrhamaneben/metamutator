@@ -1,3 +1,4 @@
+package metamutator;
 import static org.junit.Assert.*;
 
 
@@ -20,7 +21,7 @@ public class LoopExpressionMetaMutatorTest {
     public void testLoopExpressionMetaMutator() throws Exception {
         // build the model and apply the transformation
         Launcher l = new Launcher();
-        l.addInputResource("src/test/java/Foo.java");
+        l.addInputResource("src/test/java/resources/Foo.java");
         l.addProcessor(new LoopExpressionMetaMutator());
         l.run();
 

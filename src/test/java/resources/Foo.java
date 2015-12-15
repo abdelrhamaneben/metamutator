@@ -1,4 +1,6 @@
 
+package resources;
+
 public class Foo {
 	final int varinchangeable = 1;
 	public boolean op(Boolean a, Boolean b) {

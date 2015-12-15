@@ -1,8 +1,7 @@
+package metamutator;
 import static org.apache.commons.lang.reflect.MethodUtils.invokeExactMethod;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import metamutator.BinaryOperatorMetaMutator;
-import metamutator.Selector;
 
 import org.junit.Test;
 
@@ -17,7 +16,7 @@ public class BinaryOperatorMetaMutatorTest {
     public void testBinaryOperatorMetaMutator() throws Exception {
         // build the model and apply the transformation
         Launcher l = new Launcher();
-        l.addInputResource("src/test/java");
+        l.addInputResource("src/test/java/resources");
         l.addProcessor(new BinaryOperatorMetaMutator());
         l.run();
 

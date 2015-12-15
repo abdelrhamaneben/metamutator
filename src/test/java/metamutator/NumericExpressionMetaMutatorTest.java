@@ -1,3 +1,4 @@
+package metamutator;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
@@ -27,7 +28,7 @@ public class NumericExpressionMetaMutatorTest {
     public void testNumericExpressionMetaMutator() throws Exception {
         // build the model and apply the transformation
         Launcher l = new Launcher();
-        l.addInputResource("src/test/java/Foo.java");
+        l.addInputResource("src/test/java/resources/Foo.java");
         l.addProcessor(new NumericVariableMetaMutator());
         l.run();
 
