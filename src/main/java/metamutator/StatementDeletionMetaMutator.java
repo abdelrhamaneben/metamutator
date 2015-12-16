@@ -44,14 +44,8 @@ import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtEnum;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.visitor.Filter;
-import spoon.reflect.visitor.ReferenceFilter;
-import spoon.reflect.visitor.filter.CompositeFilter;
-import spoon.reflect.visitor.filter.DirectReferenceFilter;
-import spoon.reflect.visitor.filter.FilteringOperator;
-import spoon.reflect.visitor.filter.ReferenceTypeFilter;
 import spoon.reflect.visitor.filter.ReturnOrThrowFilter;
 import spoon.reflect.visitor.filter.TypeFilter;
-import spoon.reflect.visitor.filter.VariableAccessFilter;
 import spoon.support.reflect.code.CtLiteralImpl;
 import spoon.reflect.code.CtAssert;
 import spoon.reflect.code.CtAssignment;
@@ -125,6 +119,7 @@ extends AbstractProcessor<CtStatement> {
 	
 	@Override
 	public void process(CtStatement element) {
+		//System.out.println("process");
 		mutateOperator(element);
 	}
 	
@@ -194,18 +189,15 @@ extends AbstractProcessor<CtStatement> {
 				}
 			}
 		}
-
-		/*Filter<CtAssignment> filterAssignment =  new TypeFilter(CtAssignment.class);
-		//CtMethod method = thenBlock.getParent(CtMethod.class);
-		if(!ifChoice.getElements(filterAssignment).isEmpty()){
-			SetElseStatementWithAssignments(ifChoice, ifChoice.getElements(filterAssignment));
-		}*/
 		
 		Selector.generateSelector(expression, ACTIVABLE.ENABLED, thisIndex, ActivableSet, PREFIX);
 		
 		//hotSpots.add(expression);
 
 	}
+	
+	
+	
 	
 	/*
 	 * set else statement with return. 
@@ -243,62 +235,6 @@ extends AbstractProcessor<CtStatement> {
 	}
 	
 	
-	/*
-	 * Set Else statement with assignments with default values 
-	 * from a list of Assignments contained in the ifStatement
-	 */
-	/*private void SetElseStatementWithAssignments(CtIf ifStatement, List<CtAssignment> list){
-		Set<CtExpression> assigned = Sets.newHashSet();
-		
-		CtBlock elseBlock = ifStatement.getElseStatement();
-		if(elseBlock == null){
-			elseBlock = getFactory().Core().createBlock();
-		}
-		
-		for(CtAssignment element : list){
-			boolean localVariable = true;
-			CtMethod method = ifStatement.getParent(CtMethod.class);
-			Filter<CtLocalVariable> filterLocalVariable =  new TypeFilter(CtLocalVariable.class);
-			if(!ifStatement.getElements(filterLocalVariable).isEmpty()){
-				for(CtLocalVariable var : ifStatement.getElements(filterLocalVariable)){
-					//System.out.println(var);
-					ReferenceFilter refFilter = new DirectReferenceFilter(var.getReference());
-					//we find the real ref so this is a local variable
-					if(element.getAssigned().getReferences(refFilter).size() != 1){
-						localVariable = false;
-					}
-					//System.out.println(element.getAssigned().getReferences(refFilter));
-				}
-			}
-			
-			if(!localVariable){
-				continue;
-			}
-			
-			if(!assigned.contains(element.getAssigned())){
-				assigned.add(element.getAssigned());
-
-				CtAssignment assignment = getFactory().Core().clone(element);
-				
-				//create right side expression from template.
-				Class classOfAssignment = assignment.getType().getActualClass();
-				CtLiteral rightHand = null;
-				
-				if(PrimitiveTemplateExpressions.containsKey(classOfAssignment)){
-					CtLiteral templateExpression = PrimitiveTemplateExpressions.get(classOfAssignment);
-					rightHand = getFactory().Core().clone(templateExpression);
-				}else{
-					rightHand = new CtLiteralImpl().setValue(null);
-				}
-				
-				assignment.setAssignment(rightHand);
-				elseBlock.insertBegin(assignment);
-
-			}
-			
-		}
-		ifStatement.setElseStatement(elseBlock);
-	}*/
 	
 	private boolean alreadyInHotsSpot(CtElement element) {
 		CtElement parent = element.getParent();
