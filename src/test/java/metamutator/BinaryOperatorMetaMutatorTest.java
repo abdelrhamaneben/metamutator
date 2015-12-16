@@ -14,6 +14,7 @@ public class BinaryOperatorMetaMutatorTest {
 
     @Test
     public void testBinaryOperatorMetaMutator() throws Exception {
+    	int initialSelector = Selector.getAllSelectors().size();
         // build the model and apply the transformation
         Launcher l = new Launcher();
         l.addInputResource("src/test/java/resources/Foo.java");
@@ -31,7 +32,7 @@ public class BinaryOperatorMetaMutatorTest {
         Interpreter bsh = new Interpreter();
 
         // there is no selector before loading the class
-        assertEquals(0,Selector.getAllSelectors().size());
+        assertEquals(initialSelector,Selector.getAllSelectors().size());
 
         // creating a new instance of the class
         Object o = ((Class)bsh.eval(c.toString())).newInstance();  

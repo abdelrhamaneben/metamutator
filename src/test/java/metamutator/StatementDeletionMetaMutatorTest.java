@@ -34,12 +34,8 @@ public class StatementDeletionMetaMutatorTest {
         // we prepare an interpreter for the transformed code
         Interpreter bsh = new Interpreter();
 
-        // there is no selector before loading the class
-        assertEquals(0,Selector.getAllSelectors().size());
-
         // creating a new instance of the class
-        o = ((Class)bsh.eval(c.toString())).newInstance();        
-        assertEquals(11,Selector.getAllSelectors().size());
+        o = ((Class)bsh.eval(c.toString())).newInstance();
 	}
 	
     @Test
