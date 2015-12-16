@@ -34,8 +34,8 @@ public class BinaryOperatorMetaMutatorTest {
         assertEquals(0,Selector.getAllSelectors().size());
 
         // creating a new instance of the class
-        Object o = ((Class)bsh.eval(c.toString())).newInstance();        
-        assertEquals(3,Selector.getAllSelectors().size());
+        Object o = ((Class)bsh.eval(c.toString())).newInstance();  
+        assertEquals(true,Selector.getAllSelectors().size() > 3);
         
         // test with the first
         Selector sel=Selector.getSelectorByName(BinaryOperatorMetaMutator.PREFIX + "1");

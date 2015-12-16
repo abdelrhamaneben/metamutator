@@ -16,6 +16,7 @@ import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtType;
 import spoon.reflect.declaration.ModifierKind;
+
 import spoon.reflect.reference.CtGenericElementReference;
 
 import spoon.reflect.reference.CtTypeReference;
@@ -124,6 +125,7 @@ public class Selector<E> {
 			super(message);
 		}
 	}
+
 	/** Generates a field containing a new selector for this element and adds it to the current class 
 	 * 
 	 */
@@ -140,10 +142,12 @@ public class Selector<E> {
 		//CtTypeReference<Object> genericRefs = element.getFactory().Type().createTypeParameterReference(choiceClass.getCanonicalName());
 		//fieldType.addActualTypeArgument(genericRefs);
 		
+
 		String selectorFieldName = prefix + selectorId;
 		
 		CtCodeSnippetExpression<Object> codeSnippet = element.getFactory().Core()
 				.createCodeSnippetExpression();
+
 		StringBuilder sb = new StringBuilder(Selector.class.getCanonicalName() + ".of(")
 				.append(selectorId);
 		
@@ -161,6 +165,7 @@ public class Selector<E> {
 				continue;
 			}
 			sb.append(',').append(choose.getClass().getCanonicalName()+"."+choose.toString());
+
 		}
 		
 		sb.append("})");
@@ -195,4 +200,5 @@ public class Selector<E> {
 		}
 		return parent;
 	}
+
 }
